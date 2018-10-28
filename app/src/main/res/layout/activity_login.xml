@@ -16,6 +16,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="67dp"
+        android:autofillHints="username"
         android:ems="10"
         android:hint="@string/user_name"
         android:inputType="textPersonName"
@@ -24,8 +25,8 @@
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.236"
-        android:autofillHints="username" tools:targetApi="o" />
+        app:layout_constraintVertical_bias="0.36"
+        tools:targetApi="o" />
 
     <EditText
         android:id="@+id/tvPassword"
