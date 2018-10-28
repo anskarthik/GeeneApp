@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.d(TAG, "password: " + TvPassword.getText());
 
                 Intent iUsrHome = new Intent(LoginActivity.this, UserHomeActivity.class);
-                iUsrHome.putExtra("username", TvUserName.getText());
+                iUsrHome.putExtra("username", TvUserName.getText().toString());
                 startActivity(iUsrHome);
                 break;
             case R.id.btnSignUp:
