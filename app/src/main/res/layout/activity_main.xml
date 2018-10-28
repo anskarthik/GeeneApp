@@ -11,7 +11,7 @@
         android:id="@+id/imgLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/home_geene_logo"
+        android:text="@string/home_genie_logo"
         android:textColor="@color/colorPrimaryDark"
         android:textAlignment="center"
         android:textSize="60sp"

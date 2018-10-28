@@ -1,11 +1,8 @@
-package com.geene.home.geeneapp;
+package com.genie.home.genieapp;
 
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.autofill.AutofillManager;
-import android.view.autofill.AutofillValue;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 

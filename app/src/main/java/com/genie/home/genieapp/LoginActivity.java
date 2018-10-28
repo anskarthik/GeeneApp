@@ -1,4 +1,4 @@
-package com.geene.home.geeneapp;
+package com.genie.home.genieapp;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;

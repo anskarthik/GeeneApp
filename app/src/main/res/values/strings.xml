@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">GeeneApp</string>
-    <string name="home_geene_logo">Home Geene Logo</string>
+    <string name="app_name">GenieApp</string>
+    <string name="home_genie_logo">Home Genie Logo</string>
     <string name="or">Or</string>
     <string name="password">Password</string>
     <string name="sign_up">Sign Up</string>

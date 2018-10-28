@@ -1,4 +1,4 @@
-package com.geene.home.geeneapp;
+package com.genie.home.genieapp;
 
 import org.junit.Test;
 
