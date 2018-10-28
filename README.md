@@ -1,1 +1,1 @@
-# GeeneApp
+# GenieApp
