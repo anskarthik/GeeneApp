@@ -1,38 +1,20 @@
 package com.genie.home.genieapp;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.genie.home.genieapp.auth.LoginCredentials;
 import com.genie.home.genieapp.auth.LoginService;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-import static com.genie.home.genieapp.Commons.COL;
-import static com.genie.home.genieapp.Commons.GENIE_HOST;
-import static com.genie.home.genieapp.Commons.GENIE_PORT;
-import static com.genie.home.genieapp.Commons.HTTP;
-import static com.genie.home.genieapp.Commons.LOGIN_PATH;
-import static com.genie.home.genieapp.Commons.REGISTRATION_PATH;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,8 +24,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private EditText TvUserName;
     private EditText TvPassword;
+    private ProgressBar progressBar;
 
-    LoginService loginService;
     private Context context;
     private SharedPreferences sharedPreferences;
     private Handler handler;
@@ -62,9 +44,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             handler.post(new Runnable() {
                 public void run() {
-                    finish();
+                    onWaitEnd();
                     Toast.makeText(context,
                             "Login successful !!", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             });
         }
@@ -75,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         public void run(LoginCredentials loginCredentials) {
             handler.post(new Runnable() {
                 public void run() {
+                    onWaitEnd();
                     Toast.makeText(context,
                             "Login failed! Invalid credentials supplied", Toast.LENGTH_SHORT).show();
                 }
@@ -93,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             e.printStackTrace();
             handler.post(new Runnable() {
                 public void run() {
+                    onWaitEnd();
                     Toast.makeText(context,
                             "Something went wrong. Try again later", Toast.LENGTH_LONG).show();
                 }
@@ -105,23 +90,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginService = new LoginService();
         context = getApplicationContext();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         handler = new Handler(context.getMainLooper());
 
-        String username = sharedPreferences.getString("username", null);
-        String password = sharedPreferences.getString("password", null);
+        TvUserName = findViewById(R.id.tvUsrName);
+        TvPassword = findViewById(R.id.tvPassword);
+        progressBar = findViewById(R.id.progressBar);
+
+        findViewById(R.id.btnLogin).setOnClickListener(this);
+        findViewById(R.id.btnSignUp).setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final String username = sharedPreferences.getString("username", null);
+        final String password = sharedPreferences.getString("password", null);
 
         if (username != null && password != null) {
             attemptLogin(username, password);
         }
-
-        TvUserName = findViewById(R.id.tvUsrName);
-        TvPassword = findViewById(R.id.tvPassword);
-
-        findViewById(R.id.btnLogin).setOnClickListener(this);
-        findViewById(R.id.btnSignUp).setOnClickListener(this);
     }
 
     @Override
@@ -139,28 +128,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void attemptLogin(final String username, final String password) {
+    private void attemptLogin(String username, String password) {
         LoginCredentials credentials = new LoginCredentials(username, password);
 
-        CountDownLatch countDownLatch = loginService.attemptLogin(
+        CountDownLatch countDownLatch = LoginService.attemptLogin(
                 credentials,
                 onSuccess,
                 onUnauthorized,
                 onFailure);
+        onWaitStart();
+    }
 
-        ProgressDialog dialog = new ProgressDialog(this); // this = YourActivity
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("Loading. Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+    private void onWaitStart() {
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        TvUserName.setEnabled(false);
+        TvPassword.setEnabled(false);
+        findViewById(R.id.btnLogin).setEnabled(false);
+        findViewById(R.id.btnSignUp).setEnabled(false);
+    }
 
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        dialog.cancel();
+    private void onWaitEnd() {
+        progressBar.setVisibility(ProgressBar.GONE);
+        TvUserName.setEnabled(true);
+        TvPassword.setEnabled(true);
+        findViewById(R.id.btnLogin).setEnabled(true);
+        findViewById(R.id.btnSignUp).setEnabled(true);
     }
 }
