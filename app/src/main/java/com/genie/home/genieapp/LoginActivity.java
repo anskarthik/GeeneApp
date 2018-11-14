@@ -16,15 +16,22 @@ import com.genie.home.genieapp.auth.LoginService;
 
 import java.util.concurrent.CountDownLatch;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
     public static final String MyPREFERENCES = "LoginPrefs";
 
-    private EditText TvUserName;
-    private EditText TvPassword;
-    private ProgressBar progressBar;
+    @BindView(R.id.tvUsrName)
+    EditText TvUserName;
+    @BindView(R.id.tvPassword)
+    EditText TvPassword;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     private Context context;
     private SharedPreferences sharedPreferences;
@@ -89,17 +96,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
         context = getApplicationContext();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         handler = new Handler(context.getMainLooper());
-
-        TvUserName = findViewById(R.id.tvUsrName);
-        TvPassword = findViewById(R.id.tvPassword);
-        progressBar = findViewById(R.id.progressBar);
-
-        findViewById(R.id.btnLogin).setOnClickListener(this);
-        findViewById(R.id.btnSignUp).setOnClickListener(this);
     }
 
     @Override
@@ -114,6 +115,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    @OnClick({R.id.btnLogin, R.id.btnSignUp})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogin:

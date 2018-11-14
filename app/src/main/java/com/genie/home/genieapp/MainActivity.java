@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int SPLASH_TIME_OUT = 2000;
@@ -23,11 +25,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 doTransition();
             }
         }, SPLASH_TIME_OUT);
-
-        findViewById(R.id.imgLogo).setOnClickListener(this);
     }
 
     @Override
+    @OnClick(R.id.imgLogo)
     public void onClick(View view) {
         doTransition();
     }

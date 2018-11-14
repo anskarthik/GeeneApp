@@ -1,8 +1,10 @@
 package com.genie.home.genieapp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import butterknife.OnClick;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -15,6 +17,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
+    @OnClick(R.id.btnBack)
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnBack:
