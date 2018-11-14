@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    @OnClick({R.id.btnLogin, R.id.btnSignUp})
+    @OnClick({R.id.btnLogin, R.id.tvNoAccountYetRegister})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogin:
@@ -123,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 final String password = TvPassword.getText().toString();
                 attemptLogin(username, password);
                 break;
-            case R.id.btnSignUp:
+            case R.id.tvNoAccountYetRegister:
                 Intent iSignup = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(iSignup);
                 break;
@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         TvUserName.setEnabled(false);
         TvPassword.setEnabled(false);
         findViewById(R.id.btnLogin).setEnabled(false);
-        findViewById(R.id.btnSignUp).setEnabled(false);
+        findViewById(R.id.tvNoAccountYetRegister).setEnabled(false);
     }
 
     private void onWaitEnd() {
@@ -154,6 +154,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         TvUserName.setEnabled(true);
         TvPassword.setEnabled(true);
         findViewById(R.id.btnLogin).setEnabled(true);
-        findViewById(R.id.btnSignUp).setEnabled(true);
+        findViewById(R.id.tvNoAccountYetRegister).setEnabled(true);
     }
 }
