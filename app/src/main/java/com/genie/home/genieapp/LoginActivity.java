@@ -1,7 +1,10 @@
 package com.genie.home.genieapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +13,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.genie.home.genieapp.auth.LoginCredentials;
+import com.genie.home.genieapp.auth.LoginService;
+
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -31,15 +38,84 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-    private OkHttpClient httpClient = new OkHttpClient();
+    public static final String MyPREFERENCES = "LoginPrefs";
 
     private EditText TvUserName;
     private EditText TvPassword;
+
+    LoginService loginService;
+    private Context context;
+    private SharedPreferences sharedPreferences;
+    private Handler handler;
+
+    private MyRunnable<LoginCredentials> onSuccess = new MyRunnable<LoginCredentials>() {
+        @Override
+        public void run(LoginCredentials loginCredentials) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("username", loginCredentials.getUsername());
+            editor.putString("password", loginCredentials.getPassword());
+            editor.apply();
+
+            Intent iUsrHome = new Intent(LoginActivity.this, UserHomeActivity.class);
+            iUsrHome.putExtra("username", loginCredentials.getUsername());
+            startActivity(iUsrHome);
+
+            handler.post(new Runnable() {
+                public void run() {
+                    finish();
+                    Toast.makeText(context,
+                            "Login successful !!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    };
+
+    private MyRunnable<LoginCredentials> onUnauthorized = new MyRunnable<LoginCredentials>() {
+        @Override
+        public void run(LoginCredentials loginCredentials) {
+            handler.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(context,
+                            "Login failed! Invalid credentials supplied", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    };
+
+    private MyRunnable<Exception> onFailure = new MyRunnable<Exception>() {
+        @Override
+        public void run(Exception e) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("username", null);
+            editor.putString("password", null);
+            editor.apply();
+
+            e.printStackTrace();
+            handler.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(context,
+                            "Something went wrong. Try again later", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        loginService = new LoginService();
+        context = getApplicationContext();
+        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        handler = new Handler(context.getMainLooper());
+
+        String username = sharedPreferences.getString("username", null);
+        String password = sharedPreferences.getString("password", null);
+
+        if (username != null && password != null) {
+            attemptLogin(username, password);
+        }
 
         TvUserName = findViewById(R.id.tvUsrName);
         TvPassword = findViewById(R.id.tvPassword);
@@ -52,58 +128,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogin:
-                String username = TvUserName.getText().toString();
-                String password = TvPassword.getText().toString();
-
-                RequestBody requestBody = RequestBody.create(null, new byte[0]);
-                Request request = new Request.Builder()
-                        .url(HTTP + GENIE_HOST + COL + GENIE_PORT + LOGIN_PATH)
-                        .header("Authorization", Credentials.basic(username, password))
-                        .post(requestBody)
-                        .build();
-
-                final Context context = getApplicationContext();
-                final Handler handler =  new Handler(context.getMainLooper());
-                httpClient.newCall(request)
-                        .enqueue(new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                e.printStackTrace();
-                                handler.post( new Runnable() {
-                                    public void run() {
-                                        Toast.makeText(context,
-                                                "Something went wrong. Try again later", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onResponse(Call call, final Response response) {
-                                if (response.isSuccessful()) {
-                                    handler.post( new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(context,
-                                                    "Login successful !!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    Intent iUsrHome = new Intent(LoginActivity.this, UserHomeActivity.class);
-                                    iUsrHome.putExtra("username", TvUserName.getText().toString());
-                                    startActivity(iUsrHome);
-                                } else if (response.code() == 401) {
-                                    handler.post( new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(context,
-                                                    "Login failed! Invalid credentials supplied", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }
-                        });
+                final String username = TvUserName.getText().toString();
+                final String password = TvPassword.getText().toString();
+                attemptLogin(username, password);
                 break;
             case R.id.btnSignUp:
                 Intent iSignup = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(iSignup);
                 break;
         }
+    }
+
+    private void attemptLogin(final String username, final String password) {
+        LoginCredentials credentials = new LoginCredentials(username, password);
+
+        CountDownLatch countDownLatch = loginService.attemptLogin(
+                credentials,
+                onSuccess,
+                onUnauthorized,
+                onFailure);
+
+        ProgressDialog dialog = new ProgressDialog(this); // this = YourActivity
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("Loading. Please wait...");
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        dialog.cancel();
     }
 }
