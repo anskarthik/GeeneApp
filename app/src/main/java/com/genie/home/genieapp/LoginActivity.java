@@ -12,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.genie.home.genieapp.auth.LoginCredentials;
-import com.genie.home.genieapp.auth.LoginService;
+import com.genie.home.genieapp.auth.UserService;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -36,6 +36,64 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Context context;
     private SharedPreferences sharedPreferences;
     private Handler handler;
+
+    private MyRunnable<Exception> onFailure = new MyRunnable<Exception>() {
+        @Override
+        public void run(final Exception e) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("username", null);
+            editor.putString("password", null);
+            editor.apply();
+
+            e.printStackTrace();
+            handler.post(new Runnable() {
+                public void run() {
+                    onWaitEnd();
+                    Toast.makeText(context,
+                            "Something went wrong. Try again later\n" +
+                                    e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+
+        context = getApplicationContext();
+        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        handler = new Handler(context.getMainLooper());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final String username = sharedPreferences.getString("username", null);
+        final String password = sharedPreferences.getString("password", null);
+
+        if (username != null && password != null) {
+            attemptLogin(username, password);
+        }
+    }
+
+    @Override
+    @OnClick({R.id.btnLogin, R.id.tvNoAccountYetRegister})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnLogin:
+                String username = TvUserName.getText().toString();
+                String password = TvPassword.getText().toString();
+                attemptLogin(username, password);
+                break;
+            case R.id.tvNoAccountYetRegister:
+                Intent iSignup = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(iSignup);
+                break;
+        }
+    }
 
     private MyRunnable<LoginCredentials> onSuccess = new MyRunnable<LoginCredentials>() {
         @Override
@@ -73,67 +131,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
-    private MyRunnable<Exception> onFailure = new MyRunnable<Exception>() {
-        @Override
-        public void run(Exception e) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("username", null);
-            editor.putString("password", null);
-            editor.apply();
-
-            e.printStackTrace();
-            handler.post(new Runnable() {
-                public void run() {
-                    onWaitEnd();
-                    Toast.makeText(context,
-                            "Something went wrong. Try again later", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-
-        context = getApplicationContext();
-        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        handler = new Handler(context.getMainLooper());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        final String username = sharedPreferences.getString("username", null);
-        final String password = sharedPreferences.getString("password", null);
-
-        if (username != null && password != null) {
-            attemptLogin(username, password);
-        }
-    }
-
-    @Override
-    @OnClick({R.id.btnLogin, R.id.tvNoAccountYetRegister})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnLogin:
-                final String username = TvUserName.getText().toString();
-                final String password = TvPassword.getText().toString();
-                attemptLogin(username, password);
-                break;
-            case R.id.tvNoAccountYetRegister:
-                Intent iSignup = new Intent(LoginActivity.this, SignUpActivity.class);
-                startActivity(iSignup);
-                break;
-        }
-    }
-
     private void attemptLogin(String username, String password) {
         LoginCredentials credentials = new LoginCredentials(username, password);
 
-        CountDownLatch countDownLatch = LoginService.attemptLogin(
+        CountDownLatch countDownLatch = UserService.attemptLogin(
                 credentials,
                 onSuccess,
                 onUnauthorized,

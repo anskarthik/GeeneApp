@@ -2,13 +2,16 @@
     <string name="app_name">GenieApp</string>
     <string name="home_genie_logo">Home Genie Logo</string>
     <string name="or">Or</string>
-    <string name="password">Password</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="user_name">User Name</string>
-    <string name="login">Login</string>
+    <string name="password">password</string>
+    <string name="user_name">username</string>
+    <string name="login">login</string>
     <string name="hi_user">Hi %1$s !</string>
     <string name="home_genie">Home Genie</string>
-    <string name="logout">Logout</string>
+    <string name="logout">logout</string>
     <string name="no_account_yet_register">No account yet? Register</string>
     <string name="email">email</string>
+    <string name="already_have_an_account_login">Already have an account? Login</string>
+    <string name="name">name</string>
+    <string name="re_enter_password">re-enter password</string>
+    <string name="sign_up">sign up</string>
 </resources>

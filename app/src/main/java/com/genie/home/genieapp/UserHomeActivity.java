@@ -10,7 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.genie.home.genieapp.auth.LoginCredentials;
-import com.genie.home.genieapp.auth.LoginService;
+import com.genie.home.genieapp.auth.UserService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +46,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnLogout)
     public void logout() {
-        LoginService.attemptLogout(
+        UserService.attemptLogout(
                 new MyRunnable<LoginCredentials>() {
                     @Override
                     public void run(LoginCredentials loginCredentials) {
