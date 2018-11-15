@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -27,9 +27,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static final String MyPREFERENCES = "LoginPrefs";
 
     @BindView(R.id.tvUsrName)
-    EditText TvUserName;
+    TextInputEditText TvUserName;
     @BindView(R.id.tvPassword)
-    EditText TvPassword;
+    TextInputEditText TvPassword;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
@@ -86,7 +86,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btnLogin:
                 String username = TvUserName.getText().toString();
                 String password = TvPassword.getText().toString();
-                attemptLogin(username, password);
+
+                if (validate(username, password)) {
+                    attemptLogin(username, password);
+                }
                 break;
             case R.id.tvNoAccountYetRegister:
                 Intent iSignup = new Intent(LoginActivity.this, SignUpActivity.class);
@@ -130,6 +133,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             });
         }
     };
+
+    private boolean validate(String username, String password) {
+        boolean anyErrors = false;
+        if (username == null || username.isEmpty()) {
+            TvUserName.setError("email can't be empty");
+            anyErrors = true;
+        }
+        if (password == null || password.isEmpty()) {
+            TvPassword.setError("password can't be empty");
+            anyErrors = true;
+        }
+        return !anyErrors;
+    }
 
     private void attemptLogin(String username, String password) {
         LoginCredentials credentials = new LoginCredentials(username, password);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genie.home.genieapp.MyRunnable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import okhttp3.Call;
@@ -72,6 +73,20 @@ public class UserService {
                                 String responseStr = response.body().string();
                                 UserRegistrationError validationError =
                                         mapper.readValue(responseStr, UserRegistrationError.class);
+                                onValidationFailed.run(validationError);
+                            } catch (IOException e) {
+                                onFailure.run(e);
+                            } finally {
+                                countDownLatch.countDown();
+                            }
+                        } else if (response.code() == 409) {
+                            try {
+                                String responseStr = response.body().string();
+                                UserRegistrationError validationError = new UserRegistrationError();
+                                validationError.setFieldErrors(new ArrayList<FieldValidationError>());
+                                validationError.setObjectErrors(new ArrayList<String>());
+                                validationError.getObjectErrors().add(
+                                        "email already taken");
                                 onValidationFailed.run(validationError);
                             } catch (IOException e) {
                                 onFailure.run(e);
