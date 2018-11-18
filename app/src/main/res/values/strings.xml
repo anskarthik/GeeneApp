@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GenieApp</string>
+    <string name="app_name">Home Genie</string>
     <string name="home_genie_logo">Home Genie Logo</string>
     <string name="or">Or</string>
     <string name="password">password</string>
@@ -14,4 +14,10 @@
     <string name="name">name</string>
     <string name="re_enter_password">re-enter password</string>
     <string name="sign_up">sign up</string>
+    <string name="action_share">share</string>
+    <string name="email_us">email us</string>
+    <string name="nav_support">Support</string>
+    <string name="nav_help">Help</string>
+    <string name="nav_open_drawer">Open navigation drawer</string>
+    <string name="nav_close_drawer">Close navigation drawer</string>
 </resources>

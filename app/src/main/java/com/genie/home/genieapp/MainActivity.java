@@ -45,4 +45,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             finish();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        transitionHappened = true;
+        super.onDestroy();
+    }
 }
