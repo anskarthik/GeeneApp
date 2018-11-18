@@ -66,16 +66,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         context = getApplicationContext();
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         handler = new Handler(context.getMainLooper());
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        final String username = sharedPreferences.getString("username", null);
-        final String password = sharedPreferences.getString("password", null);
+        if (savedInstanceState == null) {
+            final String username = sharedPreferences.getString("username", null);
+            final String password = sharedPreferences.getString("password", null);
 
-        if (username != null && password != null) {
-            attemptLogin(username, password);
+            if (username != null && password != null) {
+                attemptLogin(username, password);
+            }
         }
     }
 
