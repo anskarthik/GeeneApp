@@ -8,49 +8,49 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.genie.home.genieapp.model.Room;
+import com.genie.home.genieapp.model.Device;
 
 import java.util.List;
 
-public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder> {
+public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHolder> {
 
     public Context mContext;
-    public List<Room> rooms;
+    public List<Device> devices;
 
-    public RoomsAdapter(Context mContext, List<Room> rooms) {
+    public DevicesAdapter(Context mContext, List<Device> devices) {
         this.mContext = mContext;
-        this.rooms = rooms;
+        this.devices = devices;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.room_cards_layout, viewGroup, false);
+                .inflate(R.layout.device_cards_layout, viewGroup, false);
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        Room room = rooms.get(i);
-        myViewHolder.title.setText(room.getRoomName());
-        myViewHolder.count.setText(room.getDevices().size() + " devices");
+        Device device = devices.get(i);
+        myViewHolder.title.setText(device.getDeviceType());
+        myViewHolder.macId.setText(String.valueOf(device.getMacId()));
     }
 
     @Override
     public int getItemCount() {
-        return rooms.size();
+        return devices.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
 
-        public TextView count;
+        public TextView macId;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
-            count = itemView.findViewById(R.id.count);
+            macId = itemView.findViewById(R.id.mac_id);
         }
 
     }

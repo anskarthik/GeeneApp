@@ -1,21 +1,23 @@
 package com.genie.home.genieapp.model;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Device implements Serializable {
 
-    private long macId;
+    private String macId;
     private String deviceType;
 
-    public Device(long macId) {
+    public Device(@NonNull String macId) {
         this.macId = macId;
     }
 
-    public long getMacId() {
+    public String getMacId() {
         return macId;
     }
 
-    public void setMacId(long macId) {
+    public void setMacId(String macId) {
         this.macId = macId;
     }
 
@@ -34,11 +36,11 @@ public class Device implements Serializable {
 
         Device device = (Device) o;
 
-        return getMacId() == device.getMacId();
+        return getMacId().equals(device.getMacId());
     }
 
     @Override
     public int hashCode() {
-        return (int) (getMacId() ^ (getMacId() >>> 32));
+        return getMacId().hashCode();
     }
 }

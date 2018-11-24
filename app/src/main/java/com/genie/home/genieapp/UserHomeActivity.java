@@ -29,7 +29,7 @@ import static com.genie.home.genieapp.LoginActivity.MyPREFERENCES;
 
 public class UserHomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        DevicesFragment.OnFragmentInteractionListener {
+        DevicesFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener {
 
     private String username;
 
@@ -83,8 +83,8 @@ public class UserHomeActivity extends AppCompatActivity
     }
 
     private void setupViewPager(ViewPager viewPager) {
+        pagerAdapter.addFragment(new RoomsFragment());
         pagerAdapter.addFragment(new DevicesFragment());
-        pagerAdapter.addFragment(new Tab2Fragment());
         pagerAdapter.addFragment(new Tab3Fragment());
         viewPager.setAdapter(pagerAdapter);
     }
