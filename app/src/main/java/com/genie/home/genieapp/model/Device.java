@@ -1,6 +1,8 @@
 package com.genie.home.genieapp.model;
 
-public class Device {
+import java.io.Serializable;
+
+public class Device implements Serializable {
 
     private long macId;
     private String deviceType;

@@ -8,8 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,19 +27,11 @@ import java.util.List;
  * Activities that contain this fragment must implement the
  * {@link DevicesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DevicesFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class DevicesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
     private static final String ROOMS = "Rooms";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private List<Room> rooms = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
@@ -49,31 +42,9 @@ public class DevicesFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DevicesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DevicesFragment newInstance(String param1, String param2) {
-        DevicesFragment fragment = new DevicesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         if (savedInstanceState != null && savedInstanceState.get(ROOMS) != null) {
             rooms = (List<Room>) savedInstanceState.get(ROOMS);
         }
@@ -81,7 +52,7 @@ public class DevicesFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putParcelableArrayList(ROOMS, new ArrayList<Room>(rooms));
+        outState.putSerializable(ROOMS, new ArrayList<Room>(rooms));
         super.onSaveInstanceState(outState);
     }
 
@@ -93,23 +64,39 @@ public class DevicesFragment extends Fragment {
         view.findViewById(R.id.floatingActionButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Room room = new Room("New room " + rooms.size());
-                rooms.add(room);
-                adapter.notifyDataSetChanged();
-                recyclerView.refreshDrawableState();
+                new RoomInputDialog(getContext(), new RoomInputDialog.TextInputDialogListener() {
+                    @Override
+                    public void onOk(Room room) {
+                        rooms.add(room);
+                        adapter.notifyDataSetChanged();
+                        recyclerView.refreshDrawableState();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                    }
+                }).setTitle("Add a room").show();
             }
         });
 
         recyclerView = view.findViewById(R.id.recycler_view);
         adapter = new RoomsAdapter(view.getContext(), rooms);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(view.getContext(), 2);
+        int spanCount = getSpanCount(view.getContext(), 180);
+        RecyclerView.LayoutManager mLayoutManager =
+                new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
         return view;
+    }
+
+    private int getSpanCount(Context context, int dpCardWidth) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return (int) (dpWidth / dpCardWidth);
     }
 
     private int dpToPx(int dp) {

@@ -60,8 +60,8 @@ public class UserHomeActivity extends AppCompatActivity
         setupViewPager(viewPager);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_devices_black_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_home_black_24dp);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_home_black_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_devices_black_24dp);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_room_black_24dp);
 
         setSupportActionBar(toolbar);
