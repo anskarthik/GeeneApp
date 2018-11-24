@@ -3,6 +3,7 @@ package com.genie.home.genieapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.genie.home.genieapp.auth.LoginCredentials;
@@ -22,12 +22,12 @@ import com.genie.home.genieapp.auth.UserService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.genie.home.genieapp.LoginActivity.MyPREFERENCES;
 
 public class UserHomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        DevicesFragment.OnFragmentInteractionListener {
 
     private String username;
 
@@ -35,9 +35,7 @@ public class UserHomeActivity extends AppCompatActivity
     private Handler handler;
     private Context context;
 
-    @BindView(R.id.tvUsernameDisplay)
-    TextView TvUsernameDisplay;
-    @BindView(R.id.toolbar)
+    @BindView(R.id.toolbarMain)
     Toolbar toolbar;
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
@@ -55,10 +53,6 @@ public class UserHomeActivity extends AppCompatActivity
         sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         handler = new Handler(context.getMainLooper());
 
-        Intent intent = getIntent();
-        username = intent.getStringExtra("username");
-        TvUsernameDisplay.setText(getString(R.string.hi_user, username));
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,
                 drawer,
                 toolbar,
@@ -72,7 +66,6 @@ public class UserHomeActivity extends AppCompatActivity
 
     }
 
-    @OnClick(R.id.btnLogout)
     public void logout() {
         UserService.attemptLogout(
                 new MyRunnable<LoginCredentials>() {
@@ -152,5 +145,10 @@ public class UserHomeActivity extends AppCompatActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        Toast.makeText(getApplicationContext(), "Fragment Clicked", Toast.LENGTH_SHORT).show();
     }
 }
