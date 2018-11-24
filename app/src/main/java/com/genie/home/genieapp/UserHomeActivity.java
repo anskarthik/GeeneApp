@@ -83,7 +83,7 @@ public class UserHomeActivity extends AppCompatActivity
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        pagerAdapter.addFragment(new Tab1Fragment());
+        pagerAdapter.addFragment(new DevicesFragment());
         pagerAdapter.addFragment(new Tab2Fragment());
         pagerAdapter.addFragment(new Tab3Fragment());
         viewPager.setAdapter(pagerAdapter);
