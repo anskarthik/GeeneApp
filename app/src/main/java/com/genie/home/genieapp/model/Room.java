@@ -1,9 +1,12 @@
 package com.genie.home.genieapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public class Room {
+public class Room implements Parcelable {
 
     private String roomName;
     private RoomType roomType;
@@ -40,6 +43,15 @@ public class Room {
 
     public void removeDevice(Device device) {
         this.devices.remove(device);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
     }
 
     public enum RoomType {

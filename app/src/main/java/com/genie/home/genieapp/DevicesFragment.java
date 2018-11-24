@@ -34,6 +34,7 @@ public class DevicesFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ROOMS = "Rooms";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -73,6 +74,15 @@ public class DevicesFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        if (savedInstanceState != null && savedInstanceState.get(ROOMS) != null) {
+            rooms = (List<Room>) savedInstanceState.get(ROOMS);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelableArrayList(ROOMS, new ArrayList<Room>(rooms));
+        super.onSaveInstanceState(outState);
     }
 
     @Override
