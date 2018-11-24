@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -41,12 +43,26 @@ public class UserHomeActivity extends AppCompatActivity
     DrawerLayout drawer;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+    @BindView(R.id.container)
+    ViewPager viewPager;
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
+
+    private PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home);
         ButterKnife.bind(this);
+
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        setupViewPager(viewPager);
+        tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_devices_black_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_home_black_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_room_black_24dp);
 
         setSupportActionBar(toolbar);
         context = getApplicationContext();
@@ -64,6 +80,13 @@ public class UserHomeActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        pagerAdapter.addFragment(new Tab1Fragment());
+        pagerAdapter.addFragment(new Tab2Fragment());
+        pagerAdapter.addFragment(new Tab3Fragment());
+        viewPager.setAdapter(pagerAdapter);
     }
 
     public void logout() {
