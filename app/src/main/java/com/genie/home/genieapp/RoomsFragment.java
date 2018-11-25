@@ -1,6 +1,8 @@
 package com.genie.home.genieapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -19,12 +21,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.genie.home.genieapp.dao.DeviceDao;
 import com.genie.home.genieapp.dao.GenieDatabaseHelper;
 import com.genie.home.genieapp.dao.RoomDao;
+import com.genie.home.genieapp.model.Device;
 import com.genie.home.genieapp.model.Room;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -141,15 +147,50 @@ public class RoomsFragment extends Fragment {
 
         RoomsAdapter.RoomMenuListener roomMenuListener = new RoomsAdapter.RoomMenuListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item, Room room) {
+            public boolean onMenuItemClick(MenuItem item, final Room room) {
                 switch (item.getItemId()) {
                     case R.id.action_add_device:
-                        // TODO
+                        List<Device> devices = DeviceDao.getAllDevices(db);
+                        final Map<String, Device> deviceMap = new HashMap<>();
+                        List<String> deviceNames = new ArrayList<>();
+                        boolean[] deviceInRoom = new boolean[devices.size()];
+
+                        for (int i = 0; i < devices.size(); i++) {
+                            Device device = devices.get(i);
+                            deviceMap.put(device.getName(), device);
+                            deviceNames.add(device.getName());
+                            deviceInRoom[i] = room.getRoomName().equals(device.getRoomName());
+                        }
+
+                        new DeviceSelectionDialog(getContext(), new DeviceSelectionDialog.DeviceSelectionListener() {
+                            @Override
+                            public void onSelected(List<String> deviceNamesToAdd, List<String> deviceNamesToRemove) {
+                                for (String deviceName : deviceNamesToAdd) {
+                                    DeviceDao.updateRoom(db, deviceMap.get(deviceName), room.getRoomName());
+                                }
+                                for (String deviceName : deviceNamesToRemove) {
+                                    DeviceDao.updateRoom(db, deviceMap.get(deviceName), null);
+                                }
+                                onRoomTableUpdated();
+                                DevicesFragment.onDeviceTableChanged();
+                            }
+                        }, deviceNames, deviceInRoom).show();
                         return true;
                     case R.id.action_delete_room:
-                        RoomDao.deleteRoom(db, room);
-                        onRoomTableUpdated();
-                        DevicesFragment.onDeviceTableChanged();
+                        new AlertDialog.Builder(getContext()).setTitle("Are you sure?")
+                                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        RoomDao.deleteRoom(db, room);
+                                        onRoomTableUpdated();
+                                        DevicesFragment.onDeviceTableChanged();
+                                    }
+                                }).show();
                         return true;
                     default:
                         return true;

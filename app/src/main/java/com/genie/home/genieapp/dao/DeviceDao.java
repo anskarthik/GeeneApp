@@ -14,13 +14,14 @@ public class DeviceDao {
     public static List<Device> getAllDevices(SQLiteDatabase db) {
         Cursor cursor = null;
         try {
-            cursor = db.query("device", new String[]{"mac_id", "name", "type"},
+            cursor = db.query("device", new String[]{"mac_id", "name", "type", "room_name"},
                     null, null, null, null, null);
 
             List<Device> devices = new ArrayList<>();
             while (cursor.moveToNext()) {
                 Device device = new Device(cursor.getString(0), cursor.getString(1));
                 device.setDeviceType(Device.DeviceType.valueOf(cursor.getString(2)));
+                device.setRoomName(cursor.getString(3));
 
                 devices.add(device);
             }
@@ -60,6 +61,27 @@ public class DeviceDao {
         try {
             cursor = db.query("device", new String[]{"mac_id", "name", "type"},
                     "mac_id=?", new String[]{macId}, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                Device device = new Device(cursor.getString(0), cursor.getString(1));
+                device.setDeviceType(Device.DeviceType.valueOf(cursor.getString(2)));
+
+                return device;
+            }
+
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static Device getByName(SQLiteDatabase db, String deviceName) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query("device", new String[]{"mac_id", "name", "type"},
+                    "name=?", new String[]{deviceName}, null, null, null);
 
             if (cursor.moveToFirst()) {
                 Device device = new Device(cursor.getString(0), cursor.getString(1));

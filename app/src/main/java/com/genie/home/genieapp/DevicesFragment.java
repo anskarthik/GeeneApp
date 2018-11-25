@@ -1,6 +1,8 @@
 package com.genie.home.genieapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -16,7 +18,9 @@ import android.view.ViewGroup;
 
 import com.genie.home.genieapp.dao.DeviceDao;
 import com.genie.home.genieapp.dao.GenieDatabaseHelper;
+import com.genie.home.genieapp.dao.RoomDao;
 import com.genie.home.genieapp.model.Device;
+import com.genie.home.genieapp.model.Room;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,14 +81,54 @@ public class DevicesFragment extends Fragment {
 
         DevicesAdapter.DeviceMenuListener deviceMenuListener = new DevicesAdapter.DeviceMenuListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item, Device device) {
+            public boolean onMenuItemClick(MenuItem item, final Device device) {
                 switch (item.getItemId()) {
                     case R.id.action_add_to_room:
+                        List<Room> rooms = RoomDao.getAllRooms(db);
+                        List<String> roomNames = new ArrayList<>();
+                        for (Room room : rooms) {
+                            roomNames.add(room.getRoomName());
+                        }
+                        new RoomSelectionDialog(getContext(), new RoomSelectionDialog.RoomSelectionListener() {
+                            @Override
+                            public void onSelection(String roomName) {
+                                DeviceDao.updateRoom(db, device, roomName);
+                                onDeviceTableChanged();
+                                RoomsFragment.onRoomTableUpdated();
+                            }
+                        }, roomNames).show();
                         return true;
-                    case R.id.action_remove_device:
-                        DeviceDao.removeDevice(db, device);
-                        onDeviceTableChanged();
-                        RoomsFragment.onRoomTableUpdated();
+                    case R.id.action_remove_from_room:
+                        new AlertDialog.Builder(getContext()).setTitle("Are you sure?")
+                                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .setNegativeButton("Remove", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DeviceDao.updateRoom(db, device, null);
+                                        onDeviceTableChanged();
+                                        RoomsFragment.onRoomTableUpdated();
+                                    }
+                                }).show();
+                        return true;
+                    case R.id.action_delete_device:
+                        new AlertDialog.Builder(getContext()).setTitle("Are you sure?")
+                                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DeviceDao.removeDevice(db, device);
+                                        onDeviceTableChanged();
+                                        RoomsFragment.onRoomTableUpdated();
+                                    }
+                                }).show();
                         return true;
                     default:
                         return true;

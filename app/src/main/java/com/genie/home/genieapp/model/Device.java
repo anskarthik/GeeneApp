@@ -10,6 +10,7 @@ public class Device implements Serializable {
 
     private String macId;
     private String name;
+    private String roomName;
     private DeviceType deviceType;
 
     public Device(@NonNull String macId, String name) {
@@ -39,6 +40,14 @@ public class Device implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 
     @Override
