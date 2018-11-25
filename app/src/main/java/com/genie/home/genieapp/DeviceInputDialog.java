@@ -15,7 +15,8 @@ import com.genie.home.genieapp.model.Device;
 
 public class DeviceInputDialog extends AlertDialog.Builder {
 
-    private TextView textView;
+    private TextView macIdTextView;
+    private TextView nameTextView;
     private Spinner spinnerView;
     private Device.DeviceType deviceType;
 
@@ -25,7 +26,8 @@ public class DeviceInputDialog extends AlertDialog.Builder {
         View dialogLayout = LayoutInflater.from(context).inflate(R.layout.device_input_dialog, null);
         setView(dialogLayout);
 
-        textView = dialogLayout.findViewById(R.id.inp_text_view);
+        macIdTextView = dialogLayout.findViewById(R.id.inp_mac_id_text_view);
+        nameTextView = dialogLayout.findViewById(R.id.inp_name_text_view);
         spinnerView = dialogLayout.findViewById(R.id.device_type_spinner);
 
         final ArrayAdapter<Device.DeviceType> spinnerAdapter = new ArrayAdapter<>(getContext(),
@@ -37,7 +39,8 @@ public class DeviceInputDialog extends AlertDialog.Builder {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (listener != null) {
-                    Device device = new Device(String.valueOf(textView.getText()));
+                    Device device = new Device(String.valueOf(macIdTextView.getText()),
+                            String.valueOf(nameTextView.getText()));
                     deviceType = (Device.DeviceType) spinnerView.getSelectedItem();
                     device.setDeviceType(deviceType);
                     listener.onOk(device);

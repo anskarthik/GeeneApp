@@ -12,8 +12,9 @@ public class Device implements Serializable {
     private String name;
     private DeviceType deviceType;
 
-    public Device(@NonNull String macId) {
+    public Device(@NonNull String macId, String name) {
         this.macId = macId;
+        this.name = name;
     }
 
     public String getMacId() {

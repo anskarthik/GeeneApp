@@ -15,10 +15,25 @@
             android:layout_height="wrap_content">
 
             <AutoCompleteTextView
-                android:id="@+id/inp_text_view"
+                android:id="@+id/inp_mac_id_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Device mac id"
+                android:hint="@string/device_mac_id"
+                android:imeOptions="actionDone"
+                android:inputType="textCapWords"
+                tools:text="@tools:sample/cities" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/inp_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/device_name"
                 android:imeOptions="actionDone"
                 android:inputType="textCapWords"
                 tools:text="@tools:sample/cities" />

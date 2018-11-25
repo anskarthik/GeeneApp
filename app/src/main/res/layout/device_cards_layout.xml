@@ -45,7 +45,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="ID3264647462634263243"
+                android:text="ID32646474626342632473434"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/room"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Room: Hall"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </LinearLayout>

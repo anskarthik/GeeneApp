@@ -19,8 +19,7 @@ public class DeviceDao {
 
             List<Device> devices = new ArrayList<>();
             while (cursor.moveToNext()) {
-                Device device = new Device(cursor.getString(0));
-                device.setName(cursor.getString(2));
+                Device device = new Device(cursor.getString(0), cursor.getString(1));
                 device.setDeviceType(Device.DeviceType.valueOf(cursor.getString(2)));
 
                 devices.add(device);
@@ -42,8 +41,7 @@ public class DeviceDao {
 
             List<Device> devices = new ArrayList<>();
             while (cursor.moveToNext()) {
-                Device device = new Device(cursor.getString(0));
-                device.setName(cursor.getString(2));
+                Device device = new Device(cursor.getString(0), cursor.getString(1));
                 device.setDeviceType(Device.DeviceType.valueOf(cursor.getString(2)));
 
                 devices.add(device);
@@ -64,8 +62,7 @@ public class DeviceDao {
                     "mac_id=?", new String[]{macId}, null, null, null);
 
             if (cursor.moveToFirst()) {
-                Device device = new Device(cursor.getString(0));
-                device.setName(cursor.getString(2));
+                Device device = new Device(cursor.getString(0), cursor.getString(1));
                 device.setDeviceType(Device.DeviceType.valueOf(cursor.getString(2)));
 
                 return device;

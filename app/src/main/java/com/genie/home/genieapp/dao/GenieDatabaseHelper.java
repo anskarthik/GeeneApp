@@ -50,6 +50,7 @@ public class GenieDatabaseHelper extends SQLiteOpenHelper {
                 "    name TEXT,\n" +
                 "    room_name TEXT, \n" +
                 "    type TEXT,\n" +
+                "    CONSTRAINT device_name_unique UNIQUE (name),\n" +
                 "    FOREIGN KEY(room_name) REFERENCES room(type),\n" +
                 "    FOREIGN KEY(type) REFERENCES device_type(type));");
     }

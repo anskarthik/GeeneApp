@@ -26,4 +26,6 @@
     <string name="add_device">add device</string>
     <string name="delete">delete</string>
     <string name="remove">remove</string>
+    <string name="device_name">Device name</string>
+    <string name="device_mac_id">Device mac id</string>
 </resources>
