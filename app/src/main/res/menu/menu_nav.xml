@@ -22,8 +22,16 @@
 
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_exit_to_app_black"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
             android:title="@string/logout"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/ic_vpn_key_black_24dp"
+            android:title="@string/login"
+            android:visible="true"
             app:showAsAction="ifRoom" />
     </group>
 

@@ -7,14 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.genie.home.genieapp.model.Device;
 
-public class DeviceInputDialog extends AlertDialog.Builder implements AdapterView.OnItemSelectedListener {
+public class DeviceInputDialog extends AlertDialog.Builder {
 
     private TextView textView;
     private Spinner spinnerView;
@@ -29,8 +28,8 @@ public class DeviceInputDialog extends AlertDialog.Builder implements AdapterVie
         textView = dialogLayout.findViewById(R.id.inp_text_view);
         spinnerView = dialogLayout.findViewById(R.id.device_type_spinner);
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, new String[]{"Light", "Fan"});
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, new String[]{"Light", "Fan", "Air Conditioner", "Exhaust"});
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerView.setAdapter(spinnerAdapter);
 
@@ -39,6 +38,7 @@ public class DeviceInputDialog extends AlertDialog.Builder implements AdapterVie
             public void onClick(DialogInterface dialog, int which) {
                 if (listener != null) {
                     Device device = new Device(String.valueOf(textView.getText()));
+                    deviceType = (String) spinnerView.getSelectedItem();
                     device.setDeviceType(deviceType);
                     listener.onOk(device);
                 }
@@ -53,16 +53,6 @@ public class DeviceInputDialog extends AlertDialog.Builder implements AdapterVie
                 }
             }
         });
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        deviceType = (String) parent.getItemAtPosition(position);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override

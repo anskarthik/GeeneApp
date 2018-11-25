@@ -7,14 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.genie.home.genieapp.model.Room;
 
-public class RoomInputDialog extends AlertDialog.Builder implements AdapterView.OnItemSelectedListener {
+public class RoomInputDialog extends AlertDialog.Builder {
 
     private TextView textView;
     private Spinner spinnerView;
@@ -39,6 +38,7 @@ public class RoomInputDialog extends AlertDialog.Builder implements AdapterView.
             public void onClick(DialogInterface dialog, int which) {
                 if (listener != null) {
                     Room room = new Room(String.valueOf(textView.getText()));
+                    roomType = (Room.RoomType) spinnerView.getSelectedItem();
                     room.setRoomType(roomType);
                     listener.onOk(room);
                 }
@@ -53,16 +53,6 @@ public class RoomInputDialog extends AlertDialog.Builder implements AdapterView.
                 }
             }
         });
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        roomType = (Room.RoomType) parent.getItemAtPosition(position);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override

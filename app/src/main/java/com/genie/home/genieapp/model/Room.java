@@ -44,7 +44,7 @@ public class Room implements Serializable {
     }
 
     public enum RoomType {
-        DRAWING_ROOM("Dining room"), DINING_ROOM("Dining room"),
+        DRAWING_ROOM("Drawing room"), DINING_ROOM("Dining room"),
         BEDROOM("Bed room"), KITCHEN("Kitchen"), BATHROOM("Bathroom");
 
         private String name;

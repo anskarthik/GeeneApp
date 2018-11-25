@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.genie.home.genieapp.model.Room;
@@ -35,6 +36,23 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
         Room room = rooms.get(i);
         myViewHolder.title.setText(room.getRoomName());
         myViewHolder.count.setText(room.getDevices().size() + " devices");
+        switch (room.getRoomType()) {
+            case BEDROOM:
+                myViewHolder.imageView.setImageResource(R.drawable.ic_bedroom);
+                break;
+            case KITCHEN:
+                myViewHolder.imageView.setImageResource(R.drawable.ic_kitchen);
+                break;
+            case BATHROOM:
+                myViewHolder.imageView.setImageResource(R.drawable.ic_bathroom);
+                break;
+            case DINING_ROOM:
+                myViewHolder.imageView.setImageResource(R.drawable.ic_dining_room);
+                break;
+            case DRAWING_ROOM:
+                myViewHolder.imageView.setImageResource(R.drawable.ic_drawing_room);
+                break;
+        }
     }
 
     @Override
@@ -44,13 +62,14 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
-
         public TextView count;
+        public ImageView imageView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             count = itemView.findViewById(R.id.count);
+            imageView = itemView.findViewById(R.id.imageView);
         }
 
     }

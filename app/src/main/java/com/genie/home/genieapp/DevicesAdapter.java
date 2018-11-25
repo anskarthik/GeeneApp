@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.genie.home.genieapp.model.Device;
@@ -35,6 +36,16 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
         Device device = devices.get(i);
         myViewHolder.title.setText(device.getDeviceType());
         myViewHolder.macId.setText(String.valueOf(device.getMacId()));
+
+        if (device.getDeviceType().toLowerCase().contains("light")) {
+            myViewHolder.imageView.setImageResource(R.drawable.ic_light);
+        } else if (device.getDeviceType().toLowerCase().contains("fan")) {
+            myViewHolder.imageView.setImageResource(R.drawable.ic_fan);
+        } else if (device.getDeviceType().toLowerCase().contains("air conditioner")) {
+            myViewHolder.imageView.setImageResource(R.drawable.ic_air_conditioner);
+        } else if (device.getDeviceType().toLowerCase().contains("exhaust")) {
+            myViewHolder.imageView.setImageResource(R.drawable.ic_exhaust);
+        }
     }
 
     @Override
@@ -44,13 +55,14 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
-
         public TextView macId;
+        public ImageView imageView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             macId = itemView.findViewById(R.id.mac_id);
+            imageView = itemView.findViewById(R.id.imageView);
         }
 
     }
