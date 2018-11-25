@@ -49,4 +49,13 @@ public class RoomDao {
         }
         db.insert("room", null, contentValue);
     }
+
+    public static void deleteRoom(SQLiteDatabase db, Room room) {
+        List<Device> devices = DeviceDao.getDevicesInARoom(db, room.getRoomName());
+        for (Device device : devices) {
+            DeviceDao.updateRoom(db, device, null);
+        }
+
+        db.delete("room", "name=?", new String[]{room.getRoomName()});
+    }
 }

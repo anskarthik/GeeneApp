@@ -10,6 +10,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,17 +30,24 @@ import java.util.List;
  */
 public class DevicesFragment extends Fragment {
 
-    private final List<Device> devices = new ArrayList<>();
+    private static final List<Device> devices = new ArrayList<>();
 
     private SQLiteOpenHelper genieDBHelper;
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
 
     private OnFragmentInteractionListener mListener;
-    private DevicesAdapter adapter;
-    private RecyclerView recyclerView;
+    private static DevicesAdapter adapter;
+    private static RecyclerView recyclerView;
 
     public DevicesFragment() {
         // Required empty public constructor
+    }
+
+    public static void onDeviceTableChanged() {
+        devices.clear();
+        devices.addAll(DeviceDao.getAllDevices(db));
+        adapter.notifyDataSetChanged();
+        recyclerView.refreshDrawableState();
     }
 
     @Override
@@ -54,10 +62,7 @@ public class DevicesFragment extends Fragment {
                     @Override
                     public void onOk(Device device) {
                         DeviceDao.addNewDevice(db, device);
-                        devices.clear();
-                        devices.addAll(DeviceDao.getAllDevices(db));
-                        adapter.notifyDataSetChanged();
-                        recyclerView.refreshDrawableState();
+                        onDeviceTableChanged();
                     }
 
                     @Override
@@ -69,16 +74,34 @@ public class DevicesFragment extends Fragment {
 
         genieDBHelper = new GenieDatabaseHelper(view.getContext());
         db = genieDBHelper.getWritableDatabase();
-        devices.addAll(DeviceDao.getAllDevices(db));
+
+        DevicesAdapter.DeviceMenuListener deviceMenuListener = new DevicesAdapter.DeviceMenuListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item, Device device) {
+                switch (item.getItemId()) {
+                    case R.id.action_add_to_room:
+                        return true;
+                    case R.id.action_remove_device:
+                        DeviceDao.removeDevice(db, device);
+                        onDeviceTableChanged();
+                        RoomsFragment.onRoomTableUpdated();
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+        };
 
         recyclerView = view.findViewById(R.id.recycler_view);
-        adapter = new DevicesAdapter(view.getContext(), devices);
+        adapter = new DevicesAdapter(view.getContext(), devices, deviceMenuListener);
 
         RecyclerView.LayoutManager mLayoutManager =
                 new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+
+        onDeviceTableChanged();
 
         return view;
     }

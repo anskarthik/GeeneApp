@@ -97,4 +97,8 @@ public class DeviceDao {
         contentValues.put("room_name", roomName);
         db.update("device", contentValues, "mac_id=?", new String[]{device.getMacId()});
     }
+
+    public static void removeDevice(SQLiteDatabase db, Device device) {
+        db.delete("device", "mac_id=?", new String[]{device.getMacId()});
+    }
 }

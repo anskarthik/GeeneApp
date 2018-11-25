@@ -15,6 +15,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,61 +35,25 @@ import java.util.List;
  */
 public class RoomsFragment extends Fragment {
 
-    private final List<Room> rooms = new ArrayList<>();
+    private static final List<Room> rooms = new ArrayList<>();
 
-    private SQLiteOpenHelper genieDBHelper;
-    private SQLiteDatabase db;
+    private static SQLiteOpenHelper genieDBHelper;
+    private static SQLiteDatabase db;
 
     private OnFragmentInteractionListener mListener;
-    private RoomsAdapter adapter;
-    private RecyclerView recyclerView;
+    private static RoomsAdapter adapter;
+    private static RecyclerView recyclerView;
 
     public RoomsFragment() {
         // Required empty public constructor
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_rooms, container, false);
-        view.findViewById(R.id.floatingActionButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new RoomInputDialog(getContext(), new RoomInputDialog.TextInputDialogListener() {
-                    @Override
-                    public void onOk(Room room) {
-                        RoomDao.addRoom(db, room);
-                        rooms.clear();
-                        rooms.addAll(RoomDao.getAllRooms(db));
-
-                        adapter.notifyDataSetChanged();
-                        recyclerView.refreshDrawableState();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                    }
-                }).setTitle("Add a room").show();
-            }
-        });
-
-        genieDBHelper = new GenieDatabaseHelper(view.getContext());
-        db = genieDBHelper.getWritableDatabase();
+    public static void onRoomTableUpdated() {
+        rooms.clear();
         rooms.addAll(RoomDao.getAllRooms(db));
 
-        recyclerView = view.findViewById(R.id.recycler_view);
-        adapter = new RoomsAdapter(view.getContext(), rooms);
-
-        int spanCount = getSpanCount(view.getContext(), 180);
-        RecyclerView.LayoutManager mLayoutManager =
-                new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, dpToPx(10), true));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-
-        return view;
+        adapter.notifyDataSetChanged();
+        recyclerView.refreshDrawableState();
     }
 
     private int getSpanCount(Context context, int dpCardWidth) {
@@ -147,6 +112,65 @@ public class RoomsFragment extends Fragment {
         if (db != null) {
             db.close();
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_rooms, container, false);
+        view.findViewById(R.id.floatingActionButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RoomInputDialog(getContext(), new RoomInputDialog.TextInputDialogListener() {
+                    @Override
+                    public void onOk(Room room) {
+                        RoomDao.addRoom(db, room);
+                        onRoomTableUpdated();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                    }
+                }).setTitle("Add a room").show();
+            }
+        });
+
+        genieDBHelper = new GenieDatabaseHelper(view.getContext());
+        db = genieDBHelper.getWritableDatabase();
+
+        RoomsAdapter.RoomMenuListener roomMenuListener = new RoomsAdapter.RoomMenuListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item, Room room) {
+                switch (item.getItemId()) {
+                    case R.id.action_add_device:
+                        // TODO
+                        return true;
+                    case R.id.action_delete_room:
+                        RoomDao.deleteRoom(db, room);
+                        onRoomTableUpdated();
+                        DevicesFragment.onDeviceTableChanged();
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+        };
+
+        recyclerView = view.findViewById(R.id.recycler_view);
+        adapter = new RoomsAdapter(view.getContext(), rooms, roomMenuListener);
+
+        int spanCount = getSpanCount(view.getContext(), 180);
+        RecyclerView.LayoutManager mLayoutManager =
+                new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, dpToPx(10), true));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+
+        onRoomTableUpdated();
+
+        return view;
     }
 
     private class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
