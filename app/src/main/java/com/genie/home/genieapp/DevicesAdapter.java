@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.genie.home.genieapp.model.Device;
 
@@ -42,7 +43,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
         myViewHolder.menuListener = menuListener;
         myViewHolder.title.setText(device.getName());
         myViewHolder.macId.setText(String.valueOf(device.getMacId()));
-        myViewHolder.room.setText("Room: " + (device.getRoomName() == null ? "" : device.getRoomName()));
+        myViewHolder.roomTextView.setText("Room: " + (device.getRoomName() == null ? "" : device.getRoomName()));
         myViewHolder.imageView.setImageResource(device.getDeviceType().getIconResource());
     }
 
@@ -59,7 +60,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
         public Device device;
         public TextView title;
         public TextView macId;
-        public TextView room;
+        public TextView roomTextView;
         public ImageView imageView;
         public ImageView optionsMenu;
         public DevicesAdapter.DeviceMenuListener menuListener;
@@ -69,7 +70,17 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
             title = itemView.findViewById(R.id.title);
             macId = itemView.findViewById(R.id.mac_id);
             imageView = itemView.findViewById(R.id.imageView);
-            room = itemView.findViewById(R.id.room);
+            roomTextView = itemView.findViewById(R.id.room);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(itemView.getContext(),
+                            device.getDeviceType() + " controls, still work in progress ...",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
             optionsMenu = itemView.findViewById(R.id.options_menu);
             optionsMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
