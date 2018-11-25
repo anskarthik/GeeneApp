@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class DevicesFragment extends Fragment {
 
-    private List<Device> devices = new ArrayList<>();
+    private final List<Device> devices = new ArrayList<>();
 
     private SQLiteOpenHelper genieDBHelper;
     private SQLiteDatabase db;

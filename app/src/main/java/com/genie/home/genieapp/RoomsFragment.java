@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class RoomsFragment extends Fragment {
 
-    private List<Room> rooms = new ArrayList<>();
+    private final List<Room> rooms = new ArrayList<>();
 
     private SQLiteOpenHelper genieDBHelper;
     private SQLiteDatabase db;
