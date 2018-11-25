@@ -34,8 +34,6 @@ import java.util.List;
  */
 public class RoomsFragment extends Fragment {
 
-    private static final String ROOMS = "Rooms";
-
     private List<Room> rooms = new ArrayList<>();
 
     private SQLiteOpenHelper genieDBHelper;
@@ -47,20 +45,6 @@ public class RoomsFragment extends Fragment {
 
     public RoomsFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.get(ROOMS) != null) {
-            rooms = (List<Room>) savedInstanceState.get(ROOMS);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(ROOMS, new ArrayList<Room>(rooms));
-        super.onSaveInstanceState(outState);
     }
 
     @Override

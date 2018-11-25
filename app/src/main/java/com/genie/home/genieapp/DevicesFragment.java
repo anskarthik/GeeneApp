@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,8 +29,6 @@ import java.util.List;
  */
 public class DevicesFragment extends Fragment {
 
-    private static final String DEVICES = "Devices";
-
     private List<Device> devices = new ArrayList<>();
 
     private SQLiteOpenHelper genieDBHelper;
@@ -43,20 +40,6 @@ public class DevicesFragment extends Fragment {
 
     public DevicesFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.get(DEVICES) != null) {
-            devices = (List<Device>) savedInstanceState.get(DEVICES);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(DEVICES, new ArrayList<Device>(devices));
-        super.onSaveInstanceState(outState);
     }
 
     @Override
