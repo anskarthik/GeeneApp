@@ -17,7 +17,7 @@ public class DeviceInputDialog extends AlertDialog.Builder {
 
     private TextView textView;
     private Spinner spinnerView;
-    private String deviceType;
+    private Device.DeviceType deviceType;
 
     public DeviceInputDialog(Context context, final TextInputDialogListener listener) {
         super(context);
@@ -28,8 +28,8 @@ public class DeviceInputDialog extends AlertDialog.Builder {
         textView = dialogLayout.findViewById(R.id.inp_text_view);
         spinnerView = dialogLayout.findViewById(R.id.device_type_spinner);
 
-        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_item, new String[]{"Light", "Fan", "Air Conditioner", "Exhaust"});
+        final ArrayAdapter<Device.DeviceType> spinnerAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, Device.DeviceType.values());
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerView.setAdapter(spinnerAdapter);
 
@@ -38,7 +38,7 @@ public class DeviceInputDialog extends AlertDialog.Builder {
             public void onClick(DialogInterface dialog, int which) {
                 if (listener != null) {
                     Device device = new Device(String.valueOf(textView.getText()));
-                    deviceType = (String) spinnerView.getSelectedItem();
+                    deviceType = (Device.DeviceType) spinnerView.getSelectedItem();
                     device.setDeviceType(deviceType);
                     listener.onOk(device);
                 }

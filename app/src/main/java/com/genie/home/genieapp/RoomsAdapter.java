@@ -36,23 +36,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
         Room room = rooms.get(i);
         myViewHolder.title.setText(room.getRoomName());
         myViewHolder.count.setText(room.getDevices().size() + " devices");
-        switch (room.getRoomType()) {
-            case BEDROOM:
-                myViewHolder.imageView.setImageResource(R.drawable.ic_bedroom);
-                break;
-            case KITCHEN:
-                myViewHolder.imageView.setImageResource(R.drawable.ic_kitchen);
-                break;
-            case BATHROOM:
-                myViewHolder.imageView.setImageResource(R.drawable.ic_bathroom);
-                break;
-            case DINING_ROOM:
-                myViewHolder.imageView.setImageResource(R.drawable.ic_dining_room);
-                break;
-            case DRAWING_ROOM:
-                myViewHolder.imageView.setImageResource(R.drawable.ic_drawing_room);
-                break;
-        }
+        myViewHolder.imageView.setImageResource(room.getRoomType().getIconResource());
     }
 
     @Override

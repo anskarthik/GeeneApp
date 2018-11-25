@@ -34,18 +34,9 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
         Device device = devices.get(i);
-        myViewHolder.title.setText(device.getDeviceType());
+        myViewHolder.title.setText(device.getName());
         myViewHolder.macId.setText(String.valueOf(device.getMacId()));
-
-        if (device.getDeviceType().toLowerCase().contains("light")) {
-            myViewHolder.imageView.setImageResource(R.drawable.ic_light);
-        } else if (device.getDeviceType().toLowerCase().contains("fan")) {
-            myViewHolder.imageView.setImageResource(R.drawable.ic_fan);
-        } else if (device.getDeviceType().toLowerCase().contains("air conditioner")) {
-            myViewHolder.imageView.setImageResource(R.drawable.ic_air_conditioner);
-        } else if (device.getDeviceType().toLowerCase().contains("exhaust")) {
-            myViewHolder.imageView.setImageResource(R.drawable.ic_exhaust);
-        }
+        myViewHolder.imageView.setImageResource(device.getDeviceType().getIconResource());
     }
 
     @Override

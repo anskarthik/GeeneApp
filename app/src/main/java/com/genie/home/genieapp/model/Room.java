@@ -1,5 +1,7 @@
 package com.genie.home.genieapp.model;
 
+import com.genie.home.genieapp.R;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,18 +46,27 @@ public class Room implements Serializable {
     }
 
     public enum RoomType {
-        DRAWING_ROOM("Drawing room"), DINING_ROOM("Dining room"),
-        BEDROOM("Bed room"), KITCHEN("Kitchen"), BATHROOM("Bathroom");
+        DRAWING_ROOM("Drawing room", R.drawable.ic_drawing_room),
+        DINING_ROOM("Dining room", R.drawable.ic_dining_room),
+        BEDROOM("Bedroom", R.drawable.ic_bedroom),
+        KITCHEN("Kitchen", R.drawable.ic_kitchen),
+        BATHROOM("Bathroom", R.drawable.ic_bathroom);
 
         private String name;
+        private int icon;
 
-        RoomType(String name) {
+        RoomType(String name, int icon) {
             this.name = name;
+            this.icon = icon;
         }
 
         @Override
         public String toString() {
             return name;
+        }
+
+        public int getIconResource() {
+            return icon;
         }
     }
 }

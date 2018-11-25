@@ -1,6 +1,8 @@
 package com.genie.home.genieapp;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.genie.home.genieapp.dao.DeviceDao;
+import com.genie.home.genieapp.dao.GenieDatabaseHelper;
 import com.genie.home.genieapp.model.Device;
 
 import java.util.ArrayList;
@@ -29,6 +33,9 @@ public class DevicesFragment extends Fragment {
     private static final String DEVICES = "Devices";
 
     private List<Device> devices = new ArrayList<>();
+
+    private SQLiteOpenHelper genieDBHelper;
+    private SQLiteDatabase db;
 
     private OnFragmentInteractionListener mListener;
     private DevicesAdapter adapter;
@@ -63,7 +70,9 @@ public class DevicesFragment extends Fragment {
                 new DeviceInputDialog(getContext(), new DeviceInputDialog.TextInputDialogListener() {
                     @Override
                     public void onOk(Device device) {
-                        devices.add(device);
+                        DeviceDao.addNewDevice(db, device);
+                        devices.clear();
+                        devices.addAll(DeviceDao.getAllDevices(db));
                         adapter.notifyDataSetChanged();
                         recyclerView.refreshDrawableState();
                     }
@@ -74,6 +83,10 @@ public class DevicesFragment extends Fragment {
                 }).setTitle("Add a device").show();
             }
         });
+
+        genieDBHelper = new GenieDatabaseHelper(view.getContext());
+        db = genieDBHelper.getWritableDatabase();
+        devices.addAll(DeviceDao.getAllDevices(db));
 
         recyclerView = view.findViewById(R.id.recycler_view);
         adapter = new DevicesAdapter(view.getContext(), devices);
@@ -124,5 +137,11 @@ public class DevicesFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        db.close();
     }
 }
