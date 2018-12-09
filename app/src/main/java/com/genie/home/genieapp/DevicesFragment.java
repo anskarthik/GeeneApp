@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +20,15 @@ import android.view.ViewGroup;
 import com.genie.home.genieapp.dao.DeviceDao;
 import com.genie.home.genieapp.dao.GenieDatabaseHelper;
 import com.genie.home.genieapp.dao.RoomDao;
+import com.genie.home.genieapp.discovery.DeviceDiscovery;
 import com.genie.home.genieapp.model.Device;
+import com.genie.home.genieapp.model.NetworkDevice;
 import com.genie.home.genieapp.model.Room;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -42,6 +47,7 @@ public class DevicesFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private static DevicesAdapter adapter;
     private static RecyclerView recyclerView;
+    private DeviceDiscovery deviceDiscovery;
 
     public DevicesFragment() {
         // Required empty public constructor
@@ -147,6 +153,24 @@ public class DevicesFragment extends Fragment {
 
         onDeviceTableChanged();
 
+        deviceDiscovery = new DeviceDiscovery(new DeviceDiscovery.DeviceDiscoveryListener() {
+            Map<String, NetworkDevice> devices = new ConcurrentHashMap<>();
+
+            @Override
+            public void onException(Exception e) {
+                Log.e(DevicesFragment.class.getName(), "Error occurred in multicast receiver", e);
+            }
+
+            @Override
+            public void onDeviceDiscovered(NetworkDevice device) {
+                if (!devices.containsKey(device.getMacId())) {
+                    Log.i(DevicesFragment.class.getName(), "Found new device\n" + device);
+                }
+                devices.put(device.getMacId(), device);
+            }
+        });
+
+        deviceDiscovery.start();
         return view;
     }
 
@@ -192,6 +216,7 @@ public class DevicesFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        deviceDiscovery.stop();
         db.close();
     }
 }

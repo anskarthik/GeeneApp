@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:networkSecurityConfig="@xml/network_security_config">
-        <activity android:name=".MainActivity">
+        <activity android:name=".UserHomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +19,7 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".UserHomeActivity"></activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

@@ -65,6 +65,16 @@ public class Device implements Serializable {
         return getMacId().hashCode();
     }
 
+    @Override
+    public String toString() {
+        return "Device{" +
+                "macId='" + macId + '\'' +
+                ", name='" + name + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", deviceType=" + deviceType +
+                '}';
+    }
+
     public enum DeviceType {
         LIGHT("Light", R.drawable.ic_light),
         FAN("Fan", R.drawable.ic_fan),
