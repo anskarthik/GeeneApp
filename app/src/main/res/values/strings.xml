@@ -34,4 +34,6 @@
         device</string>
     <string name="actions">Actions</string>
     <string name="toggle">Toggle</string>
+    <string name="on">on</string>
+    <string name="off">off</string>
 </resources>

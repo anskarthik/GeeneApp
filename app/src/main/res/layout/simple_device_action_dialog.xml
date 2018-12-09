@@ -13,6 +13,20 @@
         android:textStyle="bold" />
 
     <Button
+        android:id="@+id/btn_on"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/on" />
+
+    <Button
+        android:id="@+id/btn_off"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/off" />
+
+    <Button
         android:id="@+id/btn_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
