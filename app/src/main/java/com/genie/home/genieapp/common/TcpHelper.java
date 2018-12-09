@@ -32,7 +32,9 @@ public class TcpHelper {
 
                     String response;
                     while ((response = inFromServer.readLine()) != null) {
-                        listener.onResponse(response);
+                        if (listener.onResponse(response)) {
+                            break;
+                        }
                     }
 
                     clientSocket.close();
@@ -44,7 +46,7 @@ public class TcpHelper {
     }
 
     public interface TcpResponseListener {
-        void onResponse(String response);
+        boolean onResponse(String response);
 
         void onException(Exception e);
     }

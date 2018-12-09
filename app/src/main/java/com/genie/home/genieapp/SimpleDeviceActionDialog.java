@@ -37,7 +37,7 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                         "on",
                         new TcpHelper.TcpResponseListener() {
                             @Override
-                            public void onResponse(String response) {
+                            public boolean onResponse(String response) {
                                 if (response.toLowerCase().contains("successful")) {
                                     handler.post(new Runnable() {
                                         @Override
@@ -47,6 +47,7 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                         }
                                     });
                                 }
+                                return !response.trim().isEmpty();
                             }
 
                             @Override
@@ -72,7 +73,7 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                         "off",
                         new TcpHelper.TcpResponseListener() {
                             @Override
-                            public void onResponse(String response) {
+                            public boolean onResponse(String response) {
                                 if (response.toLowerCase().contains("successful")) {
                                     handler.post(new Runnable() {
                                         @Override
@@ -82,6 +83,7 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                         }
                                     });
                                 }
+                                return !response.trim().isEmpty();
                             }
 
                             @Override
@@ -104,10 +106,10 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
             public void onClick(View v) {
                 TcpHelper.sendDataToDevice(
                         device.getMacId(),
-                        "on",
+                        "toggle",
                         new TcpHelper.TcpResponseListener() {
                             @Override
-                            public void onResponse(String response) {
+                            public boolean onResponse(String response) {
                                 if (response.toLowerCase().contains("successful")) {
                                     handler.post(new Runnable() {
                                         @Override
@@ -117,6 +119,7 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                         }
                                     });
                                 }
+                                return !response.trim().isEmpty();
                             }
 
                             @Override

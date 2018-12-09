@@ -8,6 +8,7 @@ import com.genie.home.genieapp.model.NetworkDevice;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +20,34 @@ public class DeviceDiscovery {
     private MulticastReceiver discoveryThread;
 
     private static Map<String, NetworkDevice> discoveredDevices = new ConcurrentHashMap<>();
+
+    private static final DeviceDiscoveryListener longRunningListener;
+    private static final DeviceDiscovery longRunningInstance;
+
+    static {
+        longRunningListener = new DeviceDiscoveryListener() {
+            @Override
+            public void onException(Exception e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(5000);
+                            longRunningInstance.start();
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onDeviceDiscovered(NetworkDevice device) {
+            }
+        };
+
+        longRunningInstance = new DeviceDiscovery(longRunningListener);
+        longRunningInstance.start();
+    }
 
     public DeviceDiscovery(DeviceDiscoveryListener listener) {
         this.discoveryThread = new MulticastReceiver(listener);
@@ -37,6 +66,10 @@ public class DeviceDiscovery {
 
     public static NetworkDevice getDevice(String macId) {
         return discoveredDevices.get(macId);
+    }
+
+    public static HashMap<String, NetworkDevice> getDevices() {
+        return new HashMap<>(discoveredDevices);
     }
 
     public interface DeviceDiscoveryListener {
@@ -82,6 +115,10 @@ public class DeviceDiscovery {
                 socket.close();
             } catch (Exception e) {
                 listener.onException(e);
+            } finally {
+                if (socket != null) {
+                    socket.close();
+                }
             }
         }
 

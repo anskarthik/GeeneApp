@@ -18,8 +18,6 @@ import com.genie.home.genieapp.model.NetworkDevice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DeviceScanInputDialog extends AlertDialog.Builder {
 
@@ -32,15 +30,22 @@ public class DeviceScanInputDialog extends AlertDialog.Builder {
 
     private AlertDialog alertDialog;
 
-    public DeviceScanInputDialog(Context context, List existingMacIds, final SelectionListener listener) {
+    public DeviceScanInputDialog(Context context, List<String> addedMacIds, final SelectionListener listener) {
         super(context);
 
-        this.existingMacIds = existingMacIds;
+        this.existingMacIds = new ArrayList<>(addedMacIds);
         View dialogLayout = LayoutInflater.from(context).inflate(R.layout.device_scan_input_dialog, null);
         setView(dialogLayout);
 
         recyclerView = dialogLayout.findViewById(R.id.recycler_view);
         handler = new Handler(context.getMainLooper());
+
+        for (NetworkDevice device : DeviceDiscovery.getDevices().values()) {
+            if (!addedMacIds.contains(device.getMacId())) {
+                scanDeviceList.add(device);
+                existingMacIds.add(device.getMacId());
+            }
+        }
 
         deviceScanAdapter = new DeviceScanAdapter(getContext(), scanDeviceList, new DeviceScanAdapter.DeviceSelectListener() {
             @Override
@@ -68,8 +73,6 @@ public class DeviceScanInputDialog extends AlertDialog.Builder {
         }
 
         deviceDiscovery = new DeviceDiscovery(new DeviceDiscovery.DeviceDiscoveryListener() {
-            Map<String, NetworkDevice> deviceMap = new ConcurrentHashMap<>();
-
             @Override
             public void onException(Exception e) {
                 Log.e(this.getClass().getName(), "Exception in deviceDiscovery", e);
@@ -77,10 +80,10 @@ public class DeviceScanInputDialog extends AlertDialog.Builder {
 
             @Override
             public void onDeviceDiscovered(NetworkDevice device) {
-                if (deviceMap.containsKey(device.getMacId()) || existingMacIds.contains(device.getMacId())) {
+                if (existingMacIds.contains(device.getMacId())) {
                     return;
                 }
-                deviceMap.put(device.getMacId(), device);
+                existingMacIds.add(device.getMacId());
                 scanDeviceList.add(device);
                 handler.post(new Runnable() {
                     @Override
