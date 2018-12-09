@@ -21,6 +21,10 @@ public class DeviceInputDialog extends AlertDialog.Builder {
     private Device.DeviceType deviceType;
 
     public DeviceInputDialog(Context context, final TextInputDialogListener listener) {
+        this(context, null, listener);
+    }
+
+    public DeviceInputDialog(Context context, Device defaultDevice, final TextInputDialogListener listener) {
         super(context);
 
         View dialogLayout = LayoutInflater.from(context).inflate(R.layout.device_input_dialog, null);
@@ -34,6 +38,14 @@ public class DeviceInputDialog extends AlertDialog.Builder {
                 android.R.layout.simple_spinner_item, Device.DeviceType.values());
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerView.setAdapter(spinnerAdapter);
+
+        if (defaultDevice != null) {
+            macIdTextView.setText(defaultDevice.getMacId());
+            macIdTextView.setEnabled(false);
+            spinnerView.setSelection(
+                    spinnerAdapter.getPosition(defaultDevice.getDeviceType()));
+            spinnerView.setEnabled(false);
+        }
 
         setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

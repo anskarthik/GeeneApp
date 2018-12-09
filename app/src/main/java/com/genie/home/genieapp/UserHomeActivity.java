@@ -1,6 +1,8 @@
 package com.genie.home.genieapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -154,6 +156,18 @@ public class UserHomeActivity extends AppCompatActivity
         int id = menuItem.getItemId();
 
         switch (id) {
+            case R.id.nav_configure_device:
+                new AlertDialog.Builder(UserHomeActivity.this)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).setMessage(
+                        "1. Connect to the wifi hotspot of the device.\n" +
+                                "2. Open http://192.168.1.1 on your browser\n" +
+                                "3. Configure device settings from that web page")
+                        .setTitle("Configuring a device").show();
+                break;
             case R.id.nav_help:
                 break;
             case R.id.nav_email_us:

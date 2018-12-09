@@ -65,20 +65,34 @@ public class DevicesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
+
         view.findViewById(R.id.floatingActionButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DeviceInputDialog(getContext(), new DeviceInputDialog.TextInputDialogListener() {
+                List<String> existingMacIds = new ArrayList<>();
+                for (Device device : devices) {
+                    existingMacIds.add(device.getMacId());
+                }
+                new DeviceScanInputDialog(getContext(), existingMacIds, new DeviceScanInputDialog.SelectionListener() {
                     @Override
-                    public void onOk(Device device) {
-                        DeviceDao.addNewDevice(db, device);
-                        onDeviceTableChanged();
+                    public void onOk(NetworkDevice networkDevice) {
+                        new DeviceInputDialog(getContext(), networkDevice, new DeviceInputDialog.TextInputDialogListener() {
+                            @Override
+                            public void onOk(Device device) {
+                                DeviceDao.addNewDevice(db, device);
+                                onDeviceTableChanged();
+                            }
+
+                            @Override
+                            public void onCancel() {
+                            }
+                        }).setTitle("Name your device").show();
                     }
 
                     @Override
                     public void onCancel() {
                     }
-                }).setTitle("Add a device").show();
+                }).setTitle("New network devices").show();
             }
         });
 

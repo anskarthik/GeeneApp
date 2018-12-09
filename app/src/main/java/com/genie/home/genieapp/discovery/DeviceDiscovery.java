@@ -2,6 +2,7 @@ package com.genie.home.genieapp.discovery;
 
 import android.util.Log;
 
+import com.genie.home.genieapp.model.Device;
 import com.genie.home.genieapp.model.NetworkDevice;
 
 import java.net.DatagramPacket;
@@ -59,9 +60,10 @@ public class DeviceDiscovery {
                     String received = new String(packet.getData(), 0, packet.getLength());
                     if (received.toLowerCase().startsWith("GenieDevice,".toLowerCase())) {
                         String[] tokens = received.split(",");
-                        listener.onDeviceDiscovered(
-                                new NetworkDevice(packet.getAddress().getHostAddress(),
-                                        tokens[2].trim(), tokens[1].trim()));
+                        NetworkDevice device = new NetworkDevice(packet.getAddress().getHostAddress(),
+                                tokens[2].trim(), "");
+                        device.setDeviceType(Device.DeviceType.valueOf(tokens[1].trim().toUpperCase()));
+                        listener.onDeviceDiscovered(device);
                     }
 
                     packet.setLength(buf.length);

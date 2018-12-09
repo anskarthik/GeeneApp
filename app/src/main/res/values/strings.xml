@@ -30,4 +30,6 @@
     <string name="device_mac_id">Device mac id</string>
     <string name="remove_from_room">remove from room</string>
     <string name="add_to_room">add to room</string>
+    <string name="configure_device">configure a
+        device</string>
 </resources>
