@@ -8,6 +8,8 @@ import com.genie.home.genieapp.model.NetworkDevice;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DeviceDiscovery {
 
@@ -15,6 +17,8 @@ public class DeviceDiscovery {
     public static final String MULTICAST_ADDR = "233.255.255.255";
 
     private MulticastReceiver discoveryThread;
+
+    private static Map<String, NetworkDevice> discoveredDevices = new ConcurrentHashMap<>();
 
     public DeviceDiscovery(DeviceDiscoveryListener listener) {
         this.discoveryThread = new MulticastReceiver(listener);
@@ -29,6 +33,10 @@ public class DeviceDiscovery {
     public synchronized void stop() {
         Log.i(DeviceDiscovery.class.getName(), "Stopping DeviceDiscovery");
         discoveryThread.stopReceiving();
+    }
+
+    public static NetworkDevice getDevice(String macId) {
+        return discoveredDevices.get(macId);
     }
 
     public interface DeviceDiscoveryListener {
@@ -61,8 +69,10 @@ public class DeviceDiscovery {
                     if (received.toLowerCase().startsWith("GenieDevice,".toLowerCase())) {
                         String[] tokens = received.split(",");
                         NetworkDevice device = new NetworkDevice(packet.getAddress().getHostAddress(),
-                                tokens[2].trim(), "");
+                                Integer.valueOf(tokens[3].trim()), tokens[2].trim(), "");
                         device.setDeviceType(Device.DeviceType.valueOf(tokens[1].trim().toUpperCase()));
+
+                        discoveredDevices.put(device.getMacId(), device);
                         listener.onDeviceDiscovered(device);
                     }
 
