@@ -145,7 +145,7 @@ public class RoomsFragment extends Fragment {
         genieDBHelper = new GenieDatabaseHelper(view.getContext());
         db = genieDBHelper.getWritableDatabase();
 
-        RoomsAdapter.RoomMenuListener roomMenuListener = new RoomsAdapter.RoomMenuListener() {
+        RoomsAdapter.RoomAdapterListener roomAdapterListener = new RoomsAdapter.RoomAdapterListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item, final Room room) {
                 switch (item.getItemId()) {
@@ -196,10 +196,17 @@ public class RoomsFragment extends Fragment {
                         return true;
                 }
             }
+
+            @Override
+            public void onDeviceClick(Device device) {
+                new SimpleDeviceActionDialog(getContext(), device)
+                        .setTitle(device.getDeviceType().name() + ": " + device.getName())
+                        .show();
+            }
         };
 
         recyclerView = view.findViewById(R.id.recycler_view);
-        adapter = new RoomsAdapter(view.getContext(), rooms, roomMenuListener);
+        adapter = new RoomsAdapter(view.getContext(), rooms, roomAdapterListener);
 
         int spanCount = getSpanCount(view.getContext(), 180);
         RecyclerView.LayoutManager mLayoutManager =

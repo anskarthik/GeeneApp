@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.genie.home.genieapp.model.Device;
 
@@ -20,9 +19,9 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
 
     private Context mContext;
     private List<Device> devices;
-    private DeviceMenuListener menuListener;
+    private DeviceSelectListener menuListener;
 
-    public DevicesAdapter(Context mContext, List<Device> devices, DeviceMenuListener menuListener) {
+    public DevicesAdapter(Context mContext, List<Device> devices, DeviceSelectListener menuListener) {
         this.mContext = mContext;
         this.devices = devices;
         this.menuListener = menuListener;
@@ -40,7 +39,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
         Device device = devices.get(i);
         myViewHolder.device = device;
-        myViewHolder.menuListener = menuListener;
+        myViewHolder.listener = menuListener;
         myViewHolder.title.setText(device.getName());
         myViewHolder.macId.setText(String.valueOf(device.getMacId()));
         myViewHolder.roomTextView.setText("Room: " + (device.getRoomName() == null ? "" : device.getRoomName()));
@@ -52,8 +51,10 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
         return devices.size();
     }
 
-    public interface DeviceMenuListener {
+    public interface DeviceSelectListener {
         boolean onMenuItemClick(MenuItem item, Device device);
+
+        void onDeviceClick(Device device);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -63,7 +64,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
         public TextView roomTextView;
         public ImageView imageView;
         public ImageView optionsMenu;
-        public DevicesAdapter.DeviceMenuListener menuListener;
+        public DeviceSelectListener listener;
 
         public MyViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -75,9 +76,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(itemView.getContext(),
-                            device.getDeviceType() + " controls, still work in progress ...",
-                            Toast.LENGTH_SHORT).show();
+                    listener.onDeviceClick(device);
                 }
             });
 
@@ -89,7 +88,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.MyViewHo
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            return menuListener.onMenuItemClick(item, device);
+                            return listener.onMenuItemClick(item, device);
                         }
                     });
                     popupMenu.inflate(R.menu.menu_device_card);

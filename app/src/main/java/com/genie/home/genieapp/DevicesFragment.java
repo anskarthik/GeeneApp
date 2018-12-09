@@ -99,7 +99,7 @@ public class DevicesFragment extends Fragment {
         genieDBHelper = new GenieDatabaseHelper(view.getContext());
         db = genieDBHelper.getWritableDatabase();
 
-        DevicesAdapter.DeviceMenuListener deviceMenuListener = new DevicesAdapter.DeviceMenuListener() {
+        DevicesAdapter.DeviceSelectListener deviceSelectListener = new DevicesAdapter.DeviceSelectListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item, final Device device) {
                 switch (item.getItemId()) {
@@ -154,10 +154,17 @@ public class DevicesFragment extends Fragment {
                         return true;
                 }
             }
+
+            @Override
+            public void onDeviceClick(Device device) {
+                new SimpleDeviceActionDialog(getContext(), device)
+                        .setTitle(device.getDeviceType().name() + ": " + device.getName())
+                        .show();
+            }
         };
 
         recyclerView = view.findViewById(R.id.recycler_view);
-        adapter = new DevicesAdapter(view.getContext(), devices, deviceMenuListener);
+        adapter = new DevicesAdapter(view.getContext(), devices, deviceSelectListener);
 
         RecyclerView.LayoutManager mLayoutManager =
                 new GridLayoutManager(getContext(), 1);

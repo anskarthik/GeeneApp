@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.genie.home.genieapp.model.Device;
 import com.genie.home.genieapp.model.Room;
@@ -24,9 +23,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
 
     private Context mContext;
     private List<Room> rooms;
-    private RoomMenuListener menuListener;
+    private RoomAdapterListener menuListener;
 
-    public RoomsAdapter(Context mContext, List<Room> rooms, RoomMenuListener menuListener) {
+    public RoomsAdapter(Context mContext, List<Room> rooms, RoomAdapterListener menuListener) {
         this.mContext = mContext;
         this.rooms = rooms;
         this.menuListener = menuListener;
@@ -44,7 +43,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
         Room room = rooms.get(i);
         myViewHolder.room = room;
-        myViewHolder.menuListener = menuListener;
+        myViewHolder.listener = menuListener;
         myViewHolder.title.setText(room.getRoomName());
         myViewHolder.count.setText(room.getDevices().size() + " devices");
         myViewHolder.imageView.setImageResource(room.getRoomType().getIconResource());
@@ -55,12 +54,14 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
         return rooms.size();
     }
 
-    public interface RoomMenuListener {
+    public interface RoomAdapterListener {
         boolean onMenuItemClick(MenuItem item, Room room);
+
+        void onDeviceClick(Device device);
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public RoomMenuListener menuListener;
+        public RoomAdapterListener listener;
         public Room room;
         public TextView title;
         public TextView count;
@@ -86,9 +87,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
                             .setItems(deviceNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(itemView.getContext(),
-                                            devices.get(which).getDeviceType() + " controls, still work in progress ...",
-                                            Toast.LENGTH_SHORT).show();
+                                    listener.onDeviceClick(devices.get(which));
                                 }
                             }).show();
                 }
@@ -102,7 +101,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.MyViewHolder
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            return menuListener.onMenuItemClick(item, room);
+                            return listener.onMenuItemClick(item, room);
                         }
                     });
                     popupMenu.inflate(R.menu.menu_room_card);
