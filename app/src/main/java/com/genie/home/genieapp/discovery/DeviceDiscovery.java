@@ -8,6 +8,7 @@ import com.genie.home.genieapp.model.NetworkDevice;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +34,7 @@ public class DeviceDiscovery {
                     public void run() {
                         try {
                             Thread.sleep(5000);
-                            longRunningInstance.start();
+                            longRunningInstance.discoveryThread.run();
                         } catch (InterruptedException ignored) {
                         }
                     }
@@ -79,6 +80,8 @@ public class DeviceDiscovery {
     }
 
     public class MulticastReceiver extends Thread {
+        private static final int SOCKET_TIMEOUT = 5 * 1000;
+
         private final DeviceDiscoveryListener listener;
         private MulticastSocket socket = null;
         private byte[] buf = new byte[256];
@@ -91,12 +94,19 @@ public class DeviceDiscovery {
         public void run() {
             try {
                 socket = new MulticastSocket(PORT);
+                socket.setSoTimeout(SOCKET_TIMEOUT);
                 InetAddress group = InetAddress.getByName(MULTICAST_ADDR);
                 socket.joinGroup(group);
 
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 while (receiving) {
-                    socket.receive(packet);
+                    try {
+                        socket.receive(packet);
+                    } catch (SocketTimeoutException e) {
+                        packet.setLength(buf.length);
+                        socket.leaveGroup(group);
+                        throw e;
+                    }
 
                     String received = new String(packet.getData(), 0, packet.getLength());
                     if (received.toLowerCase().startsWith("GenieDevice,".toLowerCase())) {
@@ -112,8 +122,8 @@ public class DeviceDiscovery {
                     packet.setLength(buf.length);
                 }
                 socket.leaveGroup(group);
-                socket.close();
             } catch (Exception e) {
+                Log.e(this.getClass().getName(), "IOException raised", e);
                 listener.onException(e);
             } finally {
                 if (socket != null) {
