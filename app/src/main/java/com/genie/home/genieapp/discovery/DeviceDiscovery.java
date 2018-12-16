@@ -4,14 +4,15 @@ import android.util.Log;
 
 import com.genie.home.genieapp.model.Device;
 import com.genie.home.genieapp.model.NetworkDevice;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketTimeoutException;
-import java.util.HashMap;
+import java.net.SocketException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class DeviceDiscovery {
 
@@ -20,33 +21,12 @@ public class DeviceDiscovery {
 
     private MulticastReceiver discoveryThread;
 
-    private static Map<String, NetworkDevice> discoveredDevices = new ConcurrentHashMap<>();
-
-    private static final DeviceDiscoveryListener longRunningListener;
-    private static final DeviceDiscovery longRunningInstance;
+    private static final DeviceDiscovery longRunningInstance = new DeviceDiscovery(null);
+    private static Cache<String, NetworkDevice> discoveredDevices = CacheBuilder.newBuilder()
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build();
 
     static {
-        longRunningListener = new DeviceDiscoveryListener() {
-            @Override
-            public void onException(Exception e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(5000);
-                            longRunningInstance.discoveryThread.run();
-                        } catch (InterruptedException ignored) {
-                        }
-                    }
-                }).start();
-            }
-
-            @Override
-            public void onDeviceDiscovered(NetworkDevice device) {
-            }
-        };
-
-        longRunningInstance = new DeviceDiscovery(longRunningListener);
         longRunningInstance.start();
     }
 
@@ -66,11 +46,11 @@ public class DeviceDiscovery {
     }
 
     public static NetworkDevice getDevice(String macId) {
-        return discoveredDevices.get(macId);
+        return discoveredDevices.getIfPresent(macId);
     }
 
-    public static HashMap<String, NetworkDevice> getDevices() {
-        return new HashMap<>(discoveredDevices);
+    public static Map<String, NetworkDevice> getDevices() {
+        return discoveredDevices.asMap();
     }
 
     public interface DeviceDiscoveryListener {
@@ -80,11 +60,10 @@ public class DeviceDiscovery {
     }
 
     public class MulticastReceiver extends Thread {
-        private static final int SOCKET_TIMEOUT = 5 * 1000;
+        private static final int SOCKET_TIMEOUT = 10 * 1000;
+        private static final int SOCKET_ERROR_TIMEOUT = 5 * 1000;
 
         private final DeviceDiscoveryListener listener;
-        private MulticastSocket socket = null;
-        private byte[] buf = new byte[256];
         private volatile boolean receiving = true;
 
         public MulticastReceiver(DeviceDiscoveryListener listener) {
@@ -92,42 +71,56 @@ public class DeviceDiscovery {
         }
 
         public void run() {
-            try {
-                socket = new MulticastSocket(PORT);
-                socket.setSoTimeout(SOCKET_TIMEOUT);
-                InetAddress group = InetAddress.getByName(MULTICAST_ADDR);
-                socket.joinGroup(group);
+            while (receiving) {
+                byte[] buf = new byte[1024];
+                MulticastSocket socket = null;
+                InetAddress group = null;
+                try {
+                    group = InetAddress.getByName(MULTICAST_ADDR);
+                    socket = new MulticastSocket(PORT);
+                    socket.setSoTimeout(SOCKET_TIMEOUT);
+                    socket.joinGroup(group);
 
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                while (receiving) {
-                    try {
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                    while (receiving) {
+                        if (socket.isClosed()) {
+                            throw new SocketException("Socket is closed");
+                        }
+
                         socket.receive(packet);
-                    } catch (SocketTimeoutException e) {
-                        packet.setLength(buf.length);
-                        socket.leaveGroup(group);
-                        throw e;
-                    }
-
-                    String received = new String(packet.getData(), 0, packet.getLength());
-                    if (received.toLowerCase().startsWith("GenieDevice,".toLowerCase())) {
+                        String received = new String(packet.getData(), 0, packet.getLength());
                         String[] tokens = received.split(",");
-                        NetworkDevice device = new NetworkDevice(packet.getAddress().getHostAddress(),
-                                Integer.valueOf(tokens[3].trim()), tokens[2].trim(), "");
-                        device.setDeviceType(Device.DeviceType.valueOf(tokens[1].trim().toUpperCase()));
+                        if (tokens[0].equalsIgnoreCase("GenieDevice")) {
+                            NetworkDevice device = new NetworkDevice(packet.getAddress().getHostAddress(),
+                                    Integer.valueOf(tokens[3].trim()), tokens[2].trim(), "");
+                            device.setDeviceType(Device.DeviceType.valueOf(tokens[1].trim().toUpperCase()));
 
-                        discoveredDevices.put(device.getMacId(), device);
-                        listener.onDeviceDiscovered(device);
+                            discoveredDevices.put(device.getMacId(), device);
+                            if (listener != null) {
+                                listener.onDeviceDiscovered(device);
+                            }
+                        }
+
+                        packet.setLength(buf.length);
                     }
-
-                    packet.setLength(buf.length);
+                } catch (Exception e) {
+                    Log.e(this.getClass().getName(), "IOException raised", e);
+                    if (listener != null) {
+                        listener.onException(e);
+                    }
+                } finally {
+                    if (socket != null) {
+                        try {
+                            socket.leaveGroup(group);
+                            socket.close();
+                        } catch (Exception ignored) {
+                        }
+                    }
                 }
-                socket.leaveGroup(group);
-            } catch (Exception e) {
-                Log.e(this.getClass().getName(), "IOException raised", e);
-                listener.onException(e);
-            } finally {
-                if (socket != null) {
-                    socket.close();
+
+                try {
+                    Thread.sleep(SOCKET_ERROR_TIMEOUT);
+                } catch (InterruptedException ignored) {
                 }
             }
         }
