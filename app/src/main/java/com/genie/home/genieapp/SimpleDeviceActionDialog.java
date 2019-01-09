@@ -12,14 +12,29 @@ import android.widget.Toast;
 
 import com.genie.home.genieapp.common.TcpHelper;
 import com.genie.home.genieapp.model.Device;
+import com.genie.home.genieapp.mqtt.MqttHelper;
+
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
+import java.io.UnsupportedEncodingException;
 
 public class SimpleDeviceActionDialog extends AlertDialog.Builder {
 
     private Device device;
     private Handler handler;
+    private MqttAndroidClient mqttClient;
 
     public SimpleDeviceActionDialog(final Context context, final Device device) {
         super(context);
+
+        try {
+            String clientId = MqttClient.generateClientId();
+            mqttClient = MqttHelper.getMqttClient(context, "tcp://192.168.1.4:1883", clientId, null, null);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
 
         this.device = device;
 
@@ -62,6 +77,13 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                 });
                             }
                         });
+                try {
+                    MqttHelper.publishMessage(mqttClient, "on", 1, device.getMacId());
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         });
         Button offBtn = dialogLayout.findViewById(R.id.btn_off);
@@ -98,6 +120,14 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                 });
                             }
                         });
+
+                try {
+                    MqttHelper.publishMessage(mqttClient, "off", 1, device.getMacId());
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         });
         Button toggleBtn = dialogLayout.findViewById(R.id.btn_toggle);
@@ -134,6 +164,13 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                 });
                             }
                         });
+                try {
+                    MqttHelper.publishMessage(mqttClient, "toggle", 1, device.getMacId());
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
