@@ -29,7 +29,7 @@ public class UserService {
     private static OkHttpClient httpClient = new OkHttpClient();
     private static ObjectMapper mapper = new ObjectMapper();
 
-    private static LoginCredentials credentials;
+    public static LoginCredentials credentials;
 
     public static CountDownLatch registerUser(final UserDto userDto,
                                               final MyRunnable<UserDto> onSuccess,

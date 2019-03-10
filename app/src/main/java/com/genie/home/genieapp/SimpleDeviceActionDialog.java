@@ -12,13 +12,9 @@ import android.widget.Toast;
 
 import com.genie.home.genieapp.common.TcpHelper;
 import com.genie.home.genieapp.model.Device;
-import com.genie.home.genieapp.mqtt.MqttHelper;
+import com.genie.home.genieapp.mqtt.IotService;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.io.UnsupportedEncodingException;
 
 public class SimpleDeviceActionDialog extends AlertDialog.Builder {
 
@@ -29,12 +25,12 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
     public SimpleDeviceActionDialog(final Context context, final Device device) {
         super(context);
 
-        try {
-            String clientId = MqttClient.generateClientId();
-            mqttClient = MqttHelper.getMqttClient(context, "tcp://192.168.1.4:1883", clientId, null, null);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            String clientId = MqttClient.generateClientId();
+//            mqttClient = MqttHelper.getMqttClient(context, "tcp://192.168.1.4:1883", clientId, null, null);
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
 
         this.device = device;
 
@@ -77,13 +73,48 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                 });
                             }
                         });
-                try {
-                    MqttHelper.publishMessage(mqttClient, "on", 1, device.getMacId());
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    MqttHelper.publishMessage(mqttClient, "on", 1, device.getMacId());
+//                } catch (MqttException e) {
+//                    e.printStackTrace();
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+                IotService.publishMessage(device.getMacId(), "on",
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,
+                                                "device turn on published", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(final String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<Exception>() {
+                            @Override
+                            public void run(final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
             }
         });
         Button offBtn = dialogLayout.findViewById(R.id.btn_off);
@@ -121,13 +152,48 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                             }
                         });
 
-                try {
-                    MqttHelper.publishMessage(mqttClient, "off", 1, device.getMacId());
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    MqttHelper.publishMessage(mqttClient, "off", 1, device.getMacId());
+//                } catch (MqttException e) {
+//                    e.printStackTrace();
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+                IotService.publishMessage(device.getMacId(), "off",
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,
+                                                "device turn off published", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(final String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<Exception>() {
+                            @Override
+                            public void run(final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
             }
         });
         Button toggleBtn = dialogLayout.findViewById(R.id.btn_toggle);
@@ -164,13 +230,48 @@ public class SimpleDeviceActionDialog extends AlertDialog.Builder {
                                 });
                             }
                         });
-                try {
-                    MqttHelper.publishMessage(mqttClient, "toggle", 1, device.getMacId());
-                } catch (MqttException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    MqttHelper.publishMessage(mqttClient, "toggle", 1, device.getMacId());
+//                } catch (MqttException e) {
+//                    e.printStackTrace();
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+                IotService.publishMessage(device.getMacId(), "toggle",
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,
+                                                "device toggle published", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<String>() {
+                            @Override
+                            public void run(final String s) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        },
+                        new MyRunnable<Exception>() {
+                            @Override
+                            public void run(final Exception e) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
             }
         });
     }
